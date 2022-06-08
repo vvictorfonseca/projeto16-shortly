@@ -1,10 +1,11 @@
 import { Router } from "express";
 
-import generateShortUrl from "../controllers/urlController.js";
-import { validateToken, validateUrl } from "../middlewares/urlMiddleware.js";
+import { generateShortUrl, getUrl } from "../controllers/urlController.js";
+import { validateToken, validateUrl, validateGetUrl } from "../middlewares/urlMiddleware.js";
 
 const urlRouter = Router();
 
 urlRouter.post("/urls/shorten", validateToken, validateUrl, generateShortUrl);
+urlRouter.get("/urls/:id", validateGetUrl, getUrl)
 
 export default urlRouter;

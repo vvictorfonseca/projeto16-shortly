@@ -35,9 +35,9 @@ async function signIn(req, res) {
             [email]);
 
         await db.query(`
-            INSERT INTO sessions (token, userId)
+            INSERT INTO sessions (token, "userId")
             VALUES ($1, $2)`,
-            [token, user.id]);
+            [token, user.rows[0].id]);
 
         return res.send(token).status(200);
     

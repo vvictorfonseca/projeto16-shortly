@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt';
+
 import db from "../db.js";
 
 import signUpSchema from "../schemas/authSchema.js";
@@ -11,14 +13,15 @@ async function validateSignUp(req, res, next) {
         if (error) {
             return res.status(400).send(error.details.map((error) => error.message))
         }
-
+        console.log("passou aqui 1")
         const userExist = await db.query(`
             SELECT * FROM users
             WHERE email = $1`,
             [email]);
 
-        if (userExist) {
-            return res.send("Usuário já cadastrado!").send(409);
+        if (userExist.rows[0]) {
+            console.log("passou aqui 2")
+            return res.status(409).send("Usuário já cadastrado!");
         }
 
         next();
@@ -34,16 +37,18 @@ async function validateSignIn(req, res, next) {
 
     try {
 
-        const userExist = await db.query(`
+        const user = await db.query(`
             SELECT * FROM users
             WHERE email = $1`,
             [email]);
 
-        const correctPassword = bcrypt.compareSync(password, userExist.password)
+        const correctPassword = bcrypt.compareSync(password, user.rows[0].password)
 
-        if (!userExist || !correctPassword) {
+        if (!user.rows[0] || !correctPassword) {
             return res.send("Usuário ou senha incorreto").status(404);
         }
+
+        res.locals.user = user;
 
         next();
 
