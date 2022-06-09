@@ -98,4 +98,53 @@ async function validateGetUrl(req, res, next) {
     }
 }
 
-export { validateToken, validateUrl, validateGetUrl };
+async function validateShortUrl(req, res, next) {
+    const { shortUrl } = req.params;
+
+    try {
+        const shortUrlExist = await db.query(`
+            SELECT * FROM urls
+            WHERE "shortUrl" = $1`,
+            [shortUrl])
+
+        if (!shortUrlExist.rows[0]) {
+            return res.status(404).send("Url não encontrada em nosso banco")
+        }
+
+        next();
+
+    }catch (e) {
+        console.log(e);
+        return res.status(422).send("Erro ao conectar");
+    }
+}
+
+async function validateDeleteUrl(req, res, next) {
+    const { id } = req.params;
+    const { user } = res.locals;
+
+    console.log("userrrrrr", user.rows[0]);
+
+    try {
+        const fromUser = await db.query(`
+            SELECT * FROM urls
+            where id = $1`,
+            [id]);
+
+        if (!fromUser) {
+            return res.status(404).send("Url não encontrada");
+        }
+
+        if (fromUser.rows[0].userId != user.rows[0].id) {
+            return res.status(401).send("A url não corresponde com o usuário");
+        }
+
+        next()
+    
+    } catch (e) {
+        console.log(e);
+        return res.status(422).send("Erro ao conectar");
+    }
+}
+
+export { validateToken, validateUrl, validateGetUrl, validateShortUrl, validateDeleteUrl };

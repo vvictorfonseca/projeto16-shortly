@@ -15,7 +15,7 @@ async function generateShortUrl(req, res) {
             SELECT * FROM sessions
             WHERE "userId" = $1`,
             [user.rows[0].id]);
-        
+
         await db.query(`
             INSERT INTO urls ("userId", url, "shortUrl")
             VALUES ($1, $2, $3)`,
@@ -48,4 +48,48 @@ async function getUrl(req, res) {
     }
 }
 
-export { generateShortUrl, getUrl };
+async function getShortUrl(req, res) {
+    const { shortUrl } = req.params;
+
+    const url = await db.query(`
+        SELECT * FROM urls
+        WHERE "shortUrl" = $1;`,
+        [shortUrl]);
+
+    const count = url.rows[0].views + (1);
+    console.log("count", count);
+
+    try {
+
+        await db.query(`
+            UPDATE urls
+            SET views = $1
+            WHERE "shortUrl" = $2`,
+            [count, shortUrl]);
+
+        res.redirect(301, `http://${url.rows[0].shortUrl}`);
+
+    } catch (e) {
+        console.log(e);
+        return res.status(422).send("Não foi possível conectar");
+    }
+}
+
+async function deleteUrl(req, res) {
+    const { id } = req.params;
+
+    try {
+        await db.query(`    
+            DELETE FROM urls
+            WHERE id = $1`,
+            [id]);
+
+        return res.status(204).send("Url apagada com sucesso!")
+
+    } catch (e) {
+        console.log(e);
+        return res.status(422).send("Não foi possível conectar");
+    }
+}
+
+export { generateShortUrl, getUrl, getShortUrl, deleteUrl };
