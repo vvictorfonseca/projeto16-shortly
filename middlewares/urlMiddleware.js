@@ -98,13 +98,13 @@ async function validateGetUrl(req, res, next) {
 }
 
 async function validateShortUrl(req, res, next) {
-    const { shortUrl } = req.params;
+    const { shortUrl  } = req.params;
 
     try {
         const shortUrlExist = await db.query(`
             SELECT * FROM urls
             WHERE "shortUrl" = $1`,
-            [shortUrl])
+            [shortUrl ]);
 
         if (!shortUrlExist.rows[0]) {
             return res.status(404).send("Url não encontrada em nosso banco")

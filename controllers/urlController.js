@@ -64,7 +64,7 @@ async function getShortUrl(req, res) {
             WHERE "shortUrl" = $2`,
             [count, shortUrl]);
 
-        res.redirect(201, `http://${url.rows[0].shortUrl}`);
+        return res.redirect(url.rows[0].url);
 
     } catch (e) {
         console.log(e);
@@ -76,6 +76,7 @@ async function deleteUrl(req, res) {
     const { id } = req.params;
 
     try {
+        
         await db.query(`    
             DELETE FROM urls
             WHERE id = $1`,
