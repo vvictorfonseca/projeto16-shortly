@@ -38,8 +38,6 @@ async function getUrl(req, res) {
             WHERE id = $1`,
             [id]);
 
-        console.log(url.rows[0])
-
         return res.status(200).send(url.rows[0]);
 
     } catch (e) {
@@ -57,7 +55,6 @@ async function getShortUrl(req, res) {
         [shortUrl]);
 
     const count = url.rows[0].views + (1);
-    console.log("count", count);
 
     try {
 
@@ -67,7 +64,7 @@ async function getShortUrl(req, res) {
             WHERE "shortUrl" = $2`,
             [count, shortUrl]);
 
-        res.redirect(301, `http://${url.rows[0].shortUrl}`);
+        res.redirect(201, `http://${url.rows[0].shortUrl}`);
 
     } catch (e) {
         console.log(e);

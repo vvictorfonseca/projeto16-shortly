@@ -12,6 +12,7 @@ async function validateToken(req, res, next) {
     }
 
     try {
+
         const session = await db.query(`
             SELECT * FROM sessions
             WHERE token = $1`,
@@ -20,8 +21,6 @@ async function validateToken(req, res, next) {
         if (!session.rows[0]) {
             return res.status(422).send("Sessão não encontrada!");
         }
-
-        console.log("sessionmiddleware", session.rows)
 
         const user = await db.query(`
             SELECT * FROM users
@@ -113,7 +112,7 @@ async function validateShortUrl(req, res, next) {
 
         next();
 
-    }catch (e) {
+    } catch (e) {
         console.log(e);
         return res.status(422).send("Erro ao conectar");
     }
@@ -122,8 +121,6 @@ async function validateShortUrl(req, res, next) {
 async function validateDeleteUrl(req, res, next) {
     const { id } = req.params;
     const { user } = res.locals;
-
-    console.log("userrrrrr", user.rows[0]);
 
     try {
         const fromUser = await db.query(`
@@ -140,7 +137,7 @@ async function validateDeleteUrl(req, res, next) {
         }
 
         next()
-    
+
     } catch (e) {
         console.log(e);
         return res.status(422).send("Erro ao conectar");

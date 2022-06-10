@@ -13,14 +13,13 @@ async function validateSignUp(req, res, next) {
         if (error) {
             return res.status(400).send(error.details.map((error) => error.message))
         }
-        console.log("passou aqui 1")
+        
         const userExist = await db.query(`
             SELECT * FROM users
             WHERE email = $1`,
             [email]);
 
         if (userExist.rows[0]) {
-            console.log("passou aqui 2")
             return res.status(409).send("Usuário já cadastrado!");
         }
 
